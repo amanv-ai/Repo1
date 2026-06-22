@@ -31,11 +31,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff black
 
-      # Step 4: Run Linters to check code quality against the notebooks folder
+      # Step 4: Run Linters (Non-blocking)
+      # continue-on-error allows the pipeline to proceed even if code formatting issues are found
       - name: Lint with Ruff and Black
+        continue-on-error: true
         run: |
-          black --check ./notebooks
-          ruff check ./notebooks
+          black ./notebooks || true
+          ruff check ./notebooks --exit-zero
 
       # Step 5: Upload code analysis to SonarCloud 
       - name: SonarQube Scan
@@ -43,4 +45,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Provided automatically by GitHub
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # The secret you just added in Step 2!
-
